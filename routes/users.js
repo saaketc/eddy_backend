@@ -44,10 +44,8 @@ router.get('/profile', auth, async (req, res) => {
         let user = await User.findById(userId).select('-password -__v');
         let enrolled = [];
 
-        if(!user)
-            return res.status(404).send('User not found');
         for (let course of user.enrolledCourses){
-            let c = await Course.findById(course);
+            let c = await Course.findById(course.courseId);
             enrolled.push(c);
         }
         return res.status(200).send({user:user, enrolled:enrolled});
@@ -83,10 +81,13 @@ router.post('/enroll', auth, async (req, res) => {
     let user = await User.findById(req.user._id);
     
     for(let course of user.enrolledCourses){
-        if(course === req.body.courseId)
+        if(course.courseId === req.body.courseId)
             return res.status(400).send('Already enrolled');
-    }
-    user.enrolledCourses.push(req.body.courseId);
+      }
+      let courseObj = {
+          courseId: req.body.courseId
+      }
+      user.enrolledCourses.push(courseObj);
     await user.save();
     
     res.status(200).send(user.enrolledCourses);

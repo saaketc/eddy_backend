@@ -8,7 +8,7 @@ const userSchema = mongoose.Schema({
    
     firstName: String,
     lastName: String,
-    enrolledCourses:[String]
+    enrolledCourses:[{courseId: String, score: {type: Number, default: 0}}]
     
     
 });
