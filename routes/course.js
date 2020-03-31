@@ -1,53 +1,8 @@
 const router = require('express').Router();
 const _ = require('lodash');
-
+const auth = require('../middleware/auth');
 const { Course } = require('../models/course');
-
-
-
-// to store quiz score
-router.post('/quiz/:id', async (req, res) => {
-    try {
-        const courseId = req.params.id;
-        let course = await Course.findById(courseId);
-        
-        for (let mod of course.modules) {
-            if (String(mod._id) === String(req.body.moduleId)) {
-                mod.moduleScore += (0.7 * req.body.quizScore).toFixed(3);
-                // course.courseScore += (mod.moduleScore / course.modules.length).toFixed(2);
-                break;
-            }
-        }
-        await course.save();
-        return res.status(200).send(course);
-    }
-    catch (e) {
-        res.status(500).send(e.message);
-    }
-})
-
-// To store parental feedback score
-router.post('/parental/:id', async (req, res) => {
-    try {
-        const courseId = req.params.id;
-        let course = await Course.findById(courseId);
-        for (let mod of course.modules) {
-            if (String(mod._id) === String(req.body.moduleId)) {
-                mod.moduleScore += (0.3 * req.body.parentalScore).toFixed(3);
-                // course.courseScore += (mod.moduleScore / course.modules.length).toFixed(2);
-                break;
-            }
-        }
-        await course.save();
-        return res.status(200).send(course);
-    }
-    
-    catch (e) {
-        res.status(500).send(e.message);
-    }
-
-})
-
+const { User } = require('../models/users');
 
 // to add a chapter in a topic
 router.post('/:id', async (req, res) => {
@@ -106,6 +61,44 @@ router.get('/', async (req, res) => {
 //     //     res.status(500).send('Something went wrong');
 //     // }
 // })
+
+// to store quiz score
+router.post('/quiz/:id', auth, async (req, res) => {
+    try {
+        const courseId = req.params.id;
+        let user = await User.findById(req.user._id);
+        for (let course of user.enrolledCourses) {
+            if (course.courseId === courseId) {
+                course.score += (0.7 * req.body.quizScore);
+                break;
+            }
+        }
+        await user.save();
+        return res.status(200).send(user);
+    }
+    catch (e) {
+        res.status(500).send(e.message);
+    }
+})
+
+// To store parental feedback score
+router.post('/parental/:id', auth, async (req, res) => {
+    try {
+        const courseId = req.params.id;
+        let user = await User.findById(req.user._id);
+        for (let course of user.enrolledCourses) {
+            if (course.courseId === courseId) {
+                course.score += (0.3 * req.body.parentalScore);
+                break;
+            }
+        }
+        await user.save();
+        return res.status(200).send(user);
+    }
+    catch (e) {
+        res.status(500).send(e.message);
+    }
+})
 // to get a particular chapter of topic
 router.get('/:title', async (req, res) => {
     const topicTitle = req.params.title;

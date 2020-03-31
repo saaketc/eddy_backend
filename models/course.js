@@ -6,7 +6,6 @@ const courseSchema = mongoose.Schema({
     skills: [{ type: String }],
     transformation: [{ type: String }],
     image: String, 
-    courseScore: { type: Number, default: 0},
     modules: [
         {
             title: { type: String, required: true, maxlength: 100 },
@@ -17,8 +16,6 @@ const courseSchema = mongoose.Schema({
             quiz: [{ question: String, options: [{ value: String, weight: Number }] }],
             maxQuizScore: { type: Number },
             maxParentalScore: { type: Number },
-            moduleScore: { type: Number, default: 0 }
-
 
         }
     ]
