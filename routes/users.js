@@ -46,7 +46,10 @@ router.get('/profile', auth, async (req, res) => {
 
         for (let course of user.enrolledCourses){
             let c = await Course.findById(course.courseId);
-            enrolled.push(c);
+            if (c) {
+                enrolled.push(c);
+            }
+            else continue;
         }
         return res.status(200).send({user:user, enrolled:enrolled});
     }
