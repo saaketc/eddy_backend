@@ -38,20 +38,34 @@ router.post('/', async (req, res) => {
    
 })
 // To fetch user profile
+// router.get('/profile', auth, async (req, res) => {
+//     try{
+//         const userId = req.user._id;
+//         let user = await User.findById(userId).select('-password -__v');
+//         let enrolled = [];
+
+//         for (let course of user.enrolledCourses){
+//             let c = await Course.findById(course.courseId);
+//             if (c) {
+//                 enrolled.push(c);
+//             }
+//             else continue;
+//         }
+//         return res.status(200).send({user:user, enrolled:enrolled});
+//     }
+//      catch (e) {
+//         res.status(500).send(e.message);
+//         console.log(e);
+//     }
+
+// })
+
 router.get('/profile', auth, async (req, res) => {
     try{
         const userId = req.user._id;
         let user = await User.findById(userId).select('-password -__v');
-        let enrolled = [];
-
-        for (let course of user.enrolledCourses){
-            let c = await Course.findById(course.courseId);
-            if (c) {
-                enrolled.push(c);
-            }
-            else continue;
-        }
-        return res.status(200).send({user:user, enrolled:enrolled});
+        
+        return res.status(200).send(user);
     }
      catch (e) {
         res.status(500).send(e.message);
